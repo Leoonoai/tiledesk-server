@@ -17,7 +17,8 @@ constructor(url, options) {
   // if the connection is closed or fails to be established at all, we will reconnect
   this.amqpConn = null;
 
-  this.url = url  || "amqp://localhost";
+  // Use environment variables as fallback if no URL is provided
+  this.url = url || process.env.AMQP_MANAGER_URL || process.env.AMQP_URL || process.env.CLOUDAMQP_URL || "amqp://localhost";
   // process.env.CLOUDAMQP_URL + "?heartbeat=60"
 
   // this.exchange = 'amq.topic';
@@ -41,7 +42,7 @@ constructor(url, options) {
 
 connect(callback) {
   var that = this;
-  // console.log("[JobWorker] connect", this.url);
+  console.log("[JobWorker] Attempting to connect to:", this.url);
   // return new Promise(function (resolve, reject) {
     amqp.connect(this.url, function(err, conn) {
       if (err) {
