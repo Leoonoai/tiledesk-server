@@ -12,9 +12,23 @@ const authEvent = require('../../event/authEvent');
 
 // if the connection is closed or fails to be established at all, we will reconnect
 var amqpConn = null;
-
-var url = process.env.CLOUDAMQP_URL + "?heartbeat=60" || "amqp://localhost";
-// attento devi aggiornare configMap di PRE E PROD
+// Support multiple AMQP URL formats
+var url;
+if (process.env.CLOUDAMQP_URL) {
+    url = process.env.CLOUDAMQP_URL + "?heartbeat=60";
+} else if (process.env.AMQP_URL) {
+    url = process.env.AMQP_URL + "?heartbeat=60";
+} else if (process.env.AMQP_HOST) {
+    // Build URL from individual components
+    var protocol = process.env.AMQP_PROTOCOL || 'amqp';
+    var host = process.env.AMQP_HOST;
+    var port = process.env.AMQP_PORT || 5672;
+    var login = process.env.AMQP_LOGIN || 'guest';
+    var password = process.env.AMQP_PASSWORD || 'guest';
+    url = protocol + "://" + login + ":" + password + "@" + host + ":" + port + "?heartbeat=60";
+} else {
+    url = "amqp://localhost?heartbeat=60";
+}
 // var url = process.env.AMQP_URL + "?heartbeat=60" || "amqp://localhost?heartbeat=60";
 
 // var durable = true;
