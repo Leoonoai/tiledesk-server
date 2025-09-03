@@ -1,4 +1,4 @@
 module.exports = {
-  'location':'http://localhost:4200/',
-  'testLocation':'http://localhost:4200/',
+  'location': process.env.WIDGET_LOCATION || 'http://localhost:4200/',
+  'testLocation': process.env.WIDGET_TEST_LOCATION || 'http://localhost:4200/',
 };

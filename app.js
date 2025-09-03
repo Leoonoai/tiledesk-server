@@ -367,8 +367,32 @@ if (process.env.DISABLE_SESSION_STRATEGY==true ||  process.env.DISABLE_SESSION_S
 }
 
 //ATTENTION. If you use AWS Api Gateway you need also to configure the cors policy https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors-console.html
-app.use(cors());
-app.options('*', cors());
+
+// Configure CORS with environment variables
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, etc.)
+    if (!origin) return callback(null, true);
+    
+    // If CORS_ORIGIN is configured, use it
+    if (process.env.CORS_ORIGIN) {
+      const allowedOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim());
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error('Not allowed by CORS'));
+      }
+    }
+    
+    // Default behavior: allow all origins
+    return callback(null, true);
+  },
+  credentials: true,
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // const customRedisRateLimiter = require("./rateLimiter").customRedisRateLimiter;
 // app.use(customRedisRateLimiter);
